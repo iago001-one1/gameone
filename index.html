@@ -47,84 +47,6 @@
         pointer-events: none;
       }
 
-      .hud {
-        position: absolute;
-        z-index: 3;
-        top: clamp(1.25rem, 4vh, 3rem);
-        right: clamp(1rem, 5vw, 5rem);
-        left: clamp(1rem, 5vw, 5rem);
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        align-items: start;
-        gap: 1rem;
-      }
-
-      .player-card {
-        width: min(100%, 23rem);
-        padding: 0.8rem 1rem;
-        border: 1px solid rgb(255 255 255 / 28%);
-        background: rgb(8 9 35 / 72%);
-        box-shadow: 0 0 1.5rem rgb(9 12 48 / 45%);
-        backdrop-filter: blur(8px);
-      }
-
-      .player-card--blue {
-        justify-self: start;
-        border-left: 3px solid #25c7ff;
-      }
-
-      .player-card--red {
-        justify-self: end;
-        border-right: 3px solid #ff397c;
-        text-align: right;
-      }
-
-      .player-name {
-        display: block;
-        font-size: clamp(0.7rem, 1.5vw, 0.95rem);
-        font-weight: 800;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-      }
-
-      .player-card--blue .player-name {
-        color: #69ddff;
-      }
-
-      .player-card--red .player-name {
-        color: #ff779e;
-      }
-
-      .health {
-        height: 0.45rem;
-        margin-top: 0.65rem;
-        overflow: hidden;
-        background: rgb(255 255 255 / 16%);
-      }
-
-      .health::after {
-        display: block;
-        width: 92%;
-        height: 100%;
-        background: linear-gradient(90deg, #167dff, #54edff);
-        content: "";
-      }
-
-      .player-card--red .health::after {
-        margin-left: auto;
-        background: linear-gradient(90deg, #ffb13b, #ff397c);
-      }
-
-      .round-label {
-        padding-top: 0.8rem;
-        color: #fff;
-        font-size: 0.75rem;
-        font-weight: 800;
-        letter-spacing: 0.2em;
-        text-shadow: 0 0 1rem #d14cff;
-        text-transform: uppercase;
-      }
-
       .fighter {
         --shirt: #1598ff;
         --shirt-light: #71eaff;
@@ -379,33 +301,6 @@
         transform: scaleX(-1) rotate(-5deg);
       }
 
-      .versus {
-        position: absolute;
-        z-index: 1;
-        bottom: 34%;
-        left: 50%;
-        color: rgb(255 255 255 / 82%);
-        font-size: clamp(1.5rem, 4vw, 3.5rem);
-        font-style: italic;
-        font-weight: 1000;
-        text-shadow: 0 0 1.4rem #fc39df, 0 0 2.5rem #477bff;
-        transform: translateX(-50%);
-      }
-
-      .arena-caption {
-        position: absolute;
-        z-index: 2;
-        right: 1rem;
-        bottom: 0.75rem;
-        left: 1rem;
-        color: rgb(255 255 255 / 62%);
-        font-size: 0.65rem;
-        letter-spacing: 0.16em;
-        text-align: center;
-        text-shadow: 0 1px 5px #050617;
-        text-transform: uppercase;
-      }
-
       @keyframes idle {
         0%, 100% {
           translate: 0 0;
@@ -482,21 +377,6 @@
           background-position: center;
         }
 
-        .hud {
-          right: 0.75rem;
-          left: 0.75rem;
-          gap: 0.5rem;
-        }
-
-        .player-card {
-          padding: 0.65rem;
-        }
-
-        .round-label {
-          padding-top: 0.65rem;
-          font-size: 0.6rem;
-        }
-
         .fighter {
           width: clamp(82px, 25vw, 125px);
           height: clamp(270px, 42vh, 340px);
@@ -510,10 +390,43 @@
           margin-right: 0;
         }
 
-        .versus {
-          bottom: 34%;
-        }
+      }
 
+      .fighter {
+        width: clamp(48px, 6vw, 72px);
+        height: clamp(76px, 14vh, 112px);
+        border: 3px solid rgb(255 255 255 / 55%);
+        border-radius: 3px;
+        background: #1688ff;
+        box-shadow: inset 7px 0 rgb(255 255 255 / 18%), 0 8px 12px rgb(0 0 0 / 38%);
+        filter: none;
+        animation: none;
+        transform: translateX(var(--player-x, 0px));
+      }
+
+      .fighter--blue {
+        background: #1688ff;
+      }
+
+      .fighter--red {
+        background: #ed315f;
+      }
+
+      .fighter.is-walking {
+        animation: walk-bounce 320ms ease-in-out infinite;
+      }
+
+      .fighter.is-jumping {
+        animation: block-jump 580ms cubic-bezier(0.22, 0.75, 0.35, 1) both;
+      }
+
+      @keyframes block-jump {
+        0%, 100% {
+          translate: 0 0;
+        }
+        42% {
+          translate: 0 -12rem;
+        }
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -529,88 +442,45 @@
   </head>
   <body>
     <main class="arena" aria-label="Arena de luta neon">
-      <header class="hud" aria-label="Placar">
-        <div class="player-card player-card--blue">
-          <span class="player-name">Jogador 1</span>
-          <div class="health" aria-label="Vida: 92%"></div>
-        </div>
-        <span class="round-label">Round 01</span>
-        <div class="player-card player-card--red">
-          <span class="player-name">Jogador 2</span>
-          <div class="health" aria-label="Vida: 92%"></div>
-        </div>
-      </header>
-
       <div class="fighter fighter--blue" role="img" aria-label="Lutador com camisa azul">
-        <span class="fighter__hair"></span>
-        <span class="fighter__headband"></span>
-        <span class="fighter__head"></span>
-        <span class="fighter__face"></span>
-        <span class="fighter__brow"></span>
-        <span class="fighter__neck"></span>
-        <span class="fighter__arm fighter__arm--left"></span>
-        <span class="fighter__arm fighter__arm--right"></span>
-        <span class="fighter__torso"></span>
-        <span class="fighter__emblem"></span>
-        <span class="fighter__wristband fighter__wristband--left"></span>
-        <span class="fighter__wristband fighter__wristband--right"></span>
-        <span class="fighter__glove fighter__glove--left"></span>
-        <span class="fighter__glove fighter__glove--right"></span>
-        <span class="fighter__belt"></span>
-        <span class="fighter__leg fighter__leg--left"></span>
-        <span class="fighter__leg fighter__leg--right"></span>
-        <span class="fighter__shoe fighter__shoe--left"></span>
-        <span class="fighter__shoe fighter__shoe--right"></span>
       </div>
-
-      <span class="versus" aria-hidden="true">VS</span>
 
       <div class="fighter fighter--red" role="img" aria-label="Lutador com camisa vermelha">
-        <span class="fighter__hair"></span>
-        <span class="fighter__headband"></span>
-        <span class="fighter__head"></span>
-        <span class="fighter__face"></span>
-        <span class="fighter__brow"></span>
-        <span class="fighter__neck"></span>
-        <span class="fighter__arm fighter__arm--left"></span>
-        <span class="fighter__arm fighter__arm--right"></span>
-        <span class="fighter__torso"></span>
-        <span class="fighter__emblem"></span>
-        <span class="fighter__wristband fighter__wristband--left"></span>
-        <span class="fighter__wristband fighter__wristband--right"></span>
-        <span class="fighter__glove fighter__glove--left"></span>
-        <span class="fighter__glove fighter__glove--right"></span>
-        <span class="fighter__belt"></span>
-        <span class="fighter__leg fighter__leg--left"></span>
-        <span class="fighter__leg fighter__leg--right"></span>
-        <span class="fighter__shoe fighter__shoe--left"></span>
-        <span class="fighter__shoe fighter__shoe--right"></span>
       </div>
 
-      <p class="arena-caption">Neon City · Arena de combate</p>
     </main>
     <script>
       const arena = document.querySelector(".arena");
       const blueFighter = document.querySelector(".fighter--blue");
       const redFighter = document.querySelector(".fighter--red");
       const heldKeys = new Set();
+      const redHeldKeys = new Set();
       const movementSpeed = 280;
       let horizontalOffset = 0;
+      let redHorizontalOffset = 0;
       let animationFrame = null;
+      let redAnimationFrame = null;
       let previousFrameTime = 0;
-      let jumpTimeout = null;
+      let redPreviousFrameTime = 0;
 
-      function getMovementBounds() {
+      function getMovementBounds(fighter, otherFighter, currentOffset, direction) {
         const arenaRect = arena.getBoundingClientRect();
-        const blueRect = blueFighter.getBoundingClientRect();
-        const redRect = redFighter.getBoundingClientRect();
-        const baseLeft = blueRect.left - horizontalOffset;
+        const fighterRect = fighter.getBoundingClientRect();
+        const otherRect = otherFighter.getBoundingClientRect();
+        const baseLeft = fighterRect.left - currentOffset;
         const minOffset = arenaRect.left + 16 - baseLeft;
-        const maxOffset = Math.min(
-          redRect.left - 24,
-          arenaRect.right - 16,
-        ) - (baseLeft + blueRect.width);
-        return { min: Math.min(0, minOffset), max: Math.max(0, maxOffset) };
+        const maxOffset = arenaRect.right - 16 - (baseLeft + fighterRect.width);
+        const verticalOverlap = fighterRect.bottom > otherRect.top && fighterRect.top < otherRect.bottom;
+        let min = minOffset;
+        let max = maxOffset;
+
+        if (verticalOverlap && direction > 0 && fighterRect.left < otherRect.left) {
+          max = Math.min(max, otherRect.left - 24 - (baseLeft + fighterRect.width));
+        } else if (verticalOverlap && direction < 0 && fighterRect.left > otherRect.left) {
+          min = Math.max(min, otherRect.right + 24 - baseLeft);
+        }
+
+        return { min, max };
       }
 
       function moveFighter(time) {
@@ -622,7 +492,7 @@
 
         const elapsed = previousFrameTime ? Math.min((time - previousFrameTime) / 1000, 0.05) : 0;
         previousFrameTime = time;
-        const bounds = getMovementBounds();
+        const bounds = getMovementBounds(blueFighter, redFighter, horizontalOffset, direction);
         horizontalOffset = Math.max(
           bounds.min,
           Math.min(bounds.max, horizontalOffset + direction * movementSpeed * elapsed),
@@ -631,57 +501,99 @@
         animationFrame = requestAnimationFrame(moveFighter);
       }
 
-      function startJump() {
-        if (blueFighter.classList.contains("is-jumping")) return;
-        blueFighter.classList.add("is-jumping");
-        window.clearTimeout(jumpTimeout);
-        jumpTimeout = window.setTimeout(() => {
-          blueFighter.classList.remove("is-jumping");
+      function moveRedFighter(time) {
+        if (!redHeldKeys.has("ArrowLeft")) {
+          redAnimationFrame = null;
+          return;
+        }
+
+        const elapsed = redPreviousFrameTime ? Math.min((time - redPreviousFrameTime) / 1000, 0.05) : 0;
+        redPreviousFrameTime = time;
+        const bounds = getMovementBounds(redFighter, blueFighter, redHorizontalOffset, -1);
+        redHorizontalOffset = Math.max(
+          bounds.min,
+          Math.min(0, bounds.max, redHorizontalOffset - movementSpeed * elapsed),
+        );
+        redFighter.style.setProperty("--player-x", `${redHorizontalOffset}px`);
+        redAnimationFrame = requestAnimationFrame(moveRedFighter);
+      }
+
+      function startJump(fighter) {
+        if (fighter.classList.contains("is-jumping")) return;
+        fighter.classList.add("is-jumping");
+        window.clearTimeout(fighter.jumpTimeout);
+        fighter.jumpTimeout = window.setTimeout(() => {
+          fighter.classList.remove("is-jumping");
         }, 600);
       }
 
       document.addEventListener("keydown", (event) => {
         const key = event.key.toLowerCase();
-        if (key !== "d" && key !== "a" && key !== "w") return;
+        if (key !== "d" && key !== "a" && key !== "w" && key !== "arrowleft" && key !== "arrowup") return;
 
         event.preventDefault();
         if (key === "w") {
-          if (!event.repeat) startJump();
+          if (!event.repeat) startJump(blueFighter);
           return;
         }
 
-        heldKeys.add(key);
-        blueFighter.classList.toggle("is-walking", key === "d");
-        blueFighter.classList.toggle("is-walking-back", key === "a");
-        if (animationFrame === null) {
-          previousFrameTime = 0;
-          animationFrame = requestAnimationFrame(moveFighter);
+        if (key === "arrowup") {
+          if (!event.repeat) startJump(redFighter);
+          return;
+        }
+
+        if (key === "arrowleft") {
+          redHeldKeys.add("ArrowLeft");
+          redFighter.classList.add("is-walking");
+          if (redAnimationFrame === null) {
+            redPreviousFrameTime = 0;
+            redAnimationFrame = requestAnimationFrame(moveRedFighter);
+          }
+        } else {
+          heldKeys.add(key);
+          blueFighter.classList.toggle("is-walking", heldKeys.has("d") || heldKeys.has("a"));
+          blueFighter.classList.toggle("is-walking-back", heldKeys.has("a"));
+          if (animationFrame === null) {
+            previousFrameTime = 0;
+            animationFrame = requestAnimationFrame(moveFighter);
+          }
         }
       });
 
       document.addEventListener("keyup", (event) => {
         const key = event.key.toLowerCase();
-        if (key === "d" || key === "a") {
+        if (key === "arrowleft") {
+          redHeldKeys.delete("ArrowLeft");
+          redFighter.classList.remove("is-walking");
+        } else if (key === "d" || key === "a") {
           heldKeys.delete(key);
-          blueFighter.classList.toggle("is-walking", heldKeys.has("d"));
+          blueFighter.classList.toggle("is-walking", heldKeys.has("d") || heldKeys.has("a"));
           blueFighter.classList.toggle("is-walking-back", heldKeys.has("a"));
         }
       });
 
       window.addEventListener("blur", () => {
         heldKeys.clear();
-        blueFighter.classList.remove("is-walking");
-        blueFighter.classList.remove("is-walking-back");
+        redHeldKeys.clear();
+        blueFighter.classList.remove("is-walking", "is-walking-back");
+        redFighter.classList.remove("is-walking");
         if (animationFrame !== null) {
           cancelAnimationFrame(animationFrame);
           animationFrame = null;
         }
+        if (redAnimationFrame !== null) {
+          cancelAnimationFrame(redAnimationFrame);
+          redAnimationFrame = null;
+        }
       });
 
       window.addEventListener("resize", () => {
-        const bounds = getMovementBounds();
+        const bounds = getMovementBounds(blueFighter, redFighter, horizontalOffset, 0);
         horizontalOffset = Math.max(bounds.min, Math.min(bounds.max, horizontalOffset));
         blueFighter.style.setProperty("--player-x", `${horizontalOffset}px`);
+        const redBounds = getMovementBounds(redFighter, blueFighter, redHorizontalOffset, 0);
+        redHorizontalOffset = Math.max(redBounds.min, Math.min(redBounds.max, redHorizontalOffset));
+        redFighter.style.setProperty("--player-x", `${redHorizontalOffset}px`);
       });
     </script>
   </body>
