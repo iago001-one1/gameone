@@ -64,7 +64,7 @@
 
       .fighter--blue {
         margin-left: 3vw;
-        transform: translateX(var(--player-x, 0px));
+        transform: translate(var(--player-x, 0px), calc(0px - var(--player-y, 0px)));
       }
 
       .fighter--red {
@@ -77,7 +77,7 @@
       }
 
       .fighter__head {
-        position: absolute;
+        pzosition: absolute;
         top: 3%;
         left: 35%;
         width: 30%;
@@ -401,7 +401,7 @@
         box-shadow: inset 7px 0 rgb(255 255 255 / 18%), 0 8px 12px rgb(0 0 0 / 38%);
         filter: none;
         animation: none;
-        transform: translateX(var(--player-x, 0px));
+        transform: translate(var(--player-x, 0px), calc(0px - var(--player-y, 0px)));
       }
 
       .fighter--blue {
@@ -413,11 +413,11 @@
       }
 
       .fighter.is-walking {
-        animation: walk-bounce 320ms ease-in-out infinite;
+        animation: none;
       }
 
       .fighter.is-jumping {
-        animation: block-jump 580ms cubic-bezier(0.22, 0.75, 0.35, 1) both;
+        animation: none;
       }
 
       @keyframes block-jump {
@@ -425,7 +425,7 @@
           translate: 0 0;
         }
         42% {
-          translate: 0 -12rem;
+          translate: 0 -8rem;
         }
       }
 
@@ -449,152 +449,6 @@
       </div>
 
     </main>
-    <script>
-      const arena = document.querySelector(".arena");
-      const blueFighter = document.querySelector(".fighter--blue");
-      const redFighter = document.querySelector(".fighter--red");
-      const heldKeys = new Set();
-      const redHeldKeys = new Set();
-      const movementSpeed = 280;
-      let horizontalOffset = 0;
-      let redHorizontalOffset = 0;
-      let animationFrame = null;
-      let redAnimationFrame = null;
-      let previousFrameTime = 0;
-      let redPreviousFrameTime = 0;
-
-      function getMovementBounds(fighter, otherFighter, currentOffset, direction) {
-        const arenaRect = arena.getBoundingClientRect();
-        const fighterRect = fighter.getBoundingClientRect();
-        const otherRect = otherFighter.getBoundingClientRect();
-        const baseLeft = fighterRect.left - currentOffset;
-        const minOffset = arenaRect.left + 16 - baseLeft;
-        const maxOffset = arenaRect.right - 16 - (baseLeft + fighterRect.width);
-        const verticalOverlap = fighterRect.bottom > otherRect.top && fighterRect.top < otherRect.bottom;
-        let min = minOffset;
-        let max = maxOffset;
-
-        if (verticalOverlap && direction > 0 && fighterRect.left < otherRect.left) {
-          max = Math.min(max, otherRect.left - 24 - (baseLeft + fighterRect.width));
-        } else if (verticalOverlap && direction < 0 && fighterRect.left > otherRect.left) {
-          min = Math.max(min, otherRect.right + 24 - baseLeft);
-        }
-
-        return { min, max };
-      }
-
-      function moveFighter(time) {
-        const direction = Number(heldKeys.has("d")) - Number(heldKeys.has("a"));
-        if (direction === 0) {
-          animationFrame = null;
-          return;
-        }
-
-        const elapsed = previousFrameTime ? Math.min((time - previousFrameTime) / 1000, 0.05) : 0;
-        previousFrameTime = time;
-        const bounds = getMovementBounds(blueFighter, redFighter, horizontalOffset, direction);
-        horizontalOffset = Math.max(
-          bounds.min,
-          Math.min(bounds.max, horizontalOffset + direction * movementSpeed * elapsed),
-        );
-        blueFighter.style.setProperty("--player-x", `${horizontalOffset}px`);
-        animationFrame = requestAnimationFrame(moveFighter);
-      }
-
-      function moveRedFighter(time) {
-        if (!redHeldKeys.has("ArrowLeft")) {
-          redAnimationFrame = null;
-          return;
-        }
-
-        const elapsed = redPreviousFrameTime ? Math.min((time - redPreviousFrameTime) / 1000, 0.05) : 0;
-        redPreviousFrameTime = time;
-        const bounds = getMovementBounds(redFighter, blueFighter, redHorizontalOffset, -1);
-        redHorizontalOffset = Math.max(
-          bounds.min,
-          Math.min(0, bounds.max, redHorizontalOffset - movementSpeed * elapsed),
-        );
-        redFighter.style.setProperty("--player-x", `${redHorizontalOffset}px`);
-        redAnimationFrame = requestAnimationFrame(moveRedFighter);
-      }
-
-      function startJump(fighter) {
-        if (fighter.classList.contains("is-jumping")) return;
-        fighter.classList.add("is-jumping");
-        window.clearTimeout(fighter.jumpTimeout);
-        fighter.jumpTimeout = window.setTimeout(() => {
-          fighter.classList.remove("is-jumping");
-        }, 600);
-      }
-
-      document.addEventListener("keydown", (event) => {
-        const key = event.key.toLowerCase();
-        if (key !== "d" && key !== "a" && key !== "w" && key !== "arrowleft" && key !== "arrowup") return;
-
-        event.preventDefault();
-        if (key === "w") {
-          if (!event.repeat) startJump(blueFighter);
-          return;
-        }
-
-        if (key === "arrowup") {
-          if (!event.repeat) startJump(redFighter);
-          return;
-        }
-
-        if (key === "arrowleft") {
-          redHeldKeys.add("ArrowLeft");
-          redFighter.classList.add("is-walking");
-          if (redAnimationFrame === null) {
-            redPreviousFrameTime = 0;
-            redAnimationFrame = requestAnimationFrame(moveRedFighter);
-          }
-        } else {
-          heldKeys.add(key);
-          blueFighter.classList.toggle("is-walking", heldKeys.has("d") || heldKeys.has("a"));
-          blueFighter.classList.toggle("is-walking-back", heldKeys.has("a"));
-          if (animationFrame === null) {
-            previousFrameTime = 0;
-            animationFrame = requestAnimationFrame(moveFighter);
-          }
-        }
-      });
-
-      document.addEventListener("keyup", (event) => {
-        const key = event.key.toLowerCase();
-        if (key === "arrowleft") {
-          redHeldKeys.delete("ArrowLeft");
-          redFighter.classList.remove("is-walking");
-        } else if (key === "d" || key === "a") {
-          heldKeys.delete(key);
-          blueFighter.classList.toggle("is-walking", heldKeys.has("d") || heldKeys.has("a"));
-          blueFighter.classList.toggle("is-walking-back", heldKeys.has("a"));
-        }
-      });
-
-      window.addEventListener("blur", () => {
-        heldKeys.clear();
-        redHeldKeys.clear();
-        blueFighter.classList.remove("is-walking", "is-walking-back");
-        redFighter.classList.remove("is-walking");
-        if (animationFrame !== null) {
-          cancelAnimationFrame(animationFrame);
-          animationFrame = null;
-        }
-        if (redAnimationFrame !== null) {
-          cancelAnimationFrame(redAnimationFrame);
-          redAnimationFrame = null;
-        }
-      });
-
-      window.addEventListener("resize", () => {
-        const bounds = getMovementBounds(blueFighter, redFighter, horizontalOffset, 0);
-        horizontalOffset = Math.max(bounds.min, Math.min(bounds.max, horizontalOffset));
-        blueFighter.style.setProperty("--player-x", `${horizontalOffset}px`);
-        const redBounds = getMovementBounds(redFighter, blueFighter, redHorizontalOffset, 0);
-        redHorizontalOffset = Math.max(redBounds.min, Math.min(redBounds.max, redHorizontalOffset));
-        redFighter.style.setProperty("--player-x", `${redHorizontalOffset}px`);
-      });
-    </script>
+    <script src="main.js" defer></script>
   </body>
 </html>
